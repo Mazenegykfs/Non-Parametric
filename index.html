@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">Non-Parametric Statistical Analysis Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+       .file-input-label {
+            cursor: pointer;
+            padding: 10px;
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            display: block;
+            text-align: center;
+            transition: all 0.3s;
+        }
+       .file-input-label:hover {
+            border-color: #0d6efd;
+            background-color: #f8f9fa;
+        }
+       .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+       .language-switcher {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+       .logo-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+       .logo-img {
+            max-width: 80px;
+            height: auto;
+            border-radius: 5px;
+       }
+       .results-section {
+            display: none;
+        }
+       .test-header {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            text-align: center;
+            padding: 8px;
+            margin-top: 20px;
+        }
+       .sub-header {
+            background-color: #e9ecef;
+            font-weight: bold;
+            text-align: center;
+        }
+       .group-1 {
+            background-color: #f8f9fa;
+        }
+       .group-2 {
+            background-color: #ffffff;
+        }
+       .sig-cell {
+            font-weight: bold;
+        }
+       .sig-0 {
+            color: #dc3545;
+        }
+       .negative-ranks,.positive-ranks {
+            border-left: 2px solid #dee2e6;
+            border-right: 2px solid #dee2e6;
+        }
+        @media (min-width: 992px) {
+           .side-by-side {
+                display: flex;
+            }
+           .chart-col {
+                flex: 1;
+                padding-right: 15px;
+            }
+           .table-col {
+                flex: 1;
+                padding-left: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4 mb-5">
+        <div class="language-switcher">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-outline-primary language-btn active" data-lang="en">English</button>
+                <button type="button" class="btn btn-sm btn-outline-primary language-btn" data-lang="ar">العربية</button>
+            </div>
+        </div>
+        <div class="logo-container">
+            <!-- Placeholder for 00.png -->
+            <img src="00.png" alt="Tool Logo" class="logo-img">
+        </div>
+        <h1 class="text-center mb-0" data-i18n="title">Non-Parametric Statistical Analysis Tool</h1>
+        <h2 class="text-center h5 text-muted mt-2 mb-4">Developed by Dr. Mazen Badawy – Doctorate of TEFL</h2>
+
+        <div class="card mb-4">
+            <div class="card-header" data-i18n="uploadHeader">Upload Data Files</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="controlFile" class="form-label" data-i18n="controlLabel">Control/Pre-Test Group (Excel)</label>
+                        <input type="file" class="form-control" id="controlFile" accept=".xlsx,.xls">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="experimentalFile" class="form-label" data-i18n="experimentalLabel">Experimental/Post-Test Group (Excel)</label>
+                        <input type="file" class="form-control" id="experimentalFile" accept=".xlsx,.xls">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="testType" class="form-label" data-i18n="testTypeLabel">Select Test Type:</label>
+                        <select class="form-select" id="testType">
+                            <option value="mann-whitney" data-i18n="mannWhitneyOption">Mann-Whitney U Test (Independent Samples)</option>
+                            <option value="wilcoxon" data-i18n="wilcoxonOption">Wilcoxon Signed-Rank Test (Paired Samples)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button id="analyzeBtn" class="btn btn-primary" data-i18n="analyzeBtn">Analyze Data</button>
+                <div id="fileError" class="text-danger mt-2"></div>
+            </div>
+        </div>
+
+        <div id="resultsSection" class="results-section">
+            <div class="card mb-4">
+                <div class="card-header" data-i18n="resultsHeader">Analysis Results</div>
+                <div class="card-body side-by-side">
+                    <div class="chart-col">
+                        <div class="chart-container">
+                            <canvas id="resultsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="table-col">
+                        <div id="mannWhitneyResults" class="mb-4" style="display: none;">
+                            <div class="test-header" data-i18n="mannWhitneyTitle">Mann–Whitney U Test Results</div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="mannWhitneyTable">
+                                    <thead class="table-light">
+                                        <tr id="mannWhitneyHeader">
+                                            <th>Variables</th>
+                                            <th>Groups</th>
+                                            <th>N</th>
+                                            <th>Mean Rank</th>
+                                            <th>Sum of Ranks</th>
+                                            <th>Mann–Whitney U</th>
+                                            <th>Z</th>
+                                            <th>**Asymp. Sig. (2-tailed)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="mannWhitneyBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="wilcoxonResults" class="mb-4" style="display: none;">
+                            <div class="test-header" data-i18n="wilcoxonTitle">Wilcoxon Signed-Rank Test Results</div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="wilcoxonTable">
+                                    <thead class="table-light">
+                                        <tr id="wilcoxonHeader1">
+                                            <th rowspan="2">Skills</th>
+                                            <th rowspan="2">Measurement</th>
+                                            <th rowspan="2">N</th>
+                                            <th rowspan="2">Mean</th>
+                                            <th colspan="2" class="negative-ranks">Negative Ranks</th>
+                                            <th colspan="2" class="positive-ranks">Positive Ranks</th>
+                                            <th rowspan="2">Z</th>
+                                            <th rowspan="2">**.Sig</th>
+                                        </tr>
+                                        <tr id="wilcoxonHeader2">
+                                            <th class="sub-header negative-ranks">Mean Rank</th>
+                                            <th class="sub-header negative-ranks">Sum of Ranks</th>
+                                            <th class="sub-header positive-ranks">Mean Rank</th>
+                                            <th class="sub-header positive-ranks">Sum of Ranks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="wilcoxonBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <button id="exportBtn" class="btn btn-success mt-3" data-i18n="exportBtn">Export to Excel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script>
+        // Internationalization content
+        const i18nContent = {
+            en: {
+                title: "Non-Parametric Statistical Analysis Tool",
+                uploadHeader: "Upload Data Files",
+                controlLabel: "Control/Pre-Test Group (Excel)",
+                experimentalLabel: "Experimental/Post-Test Group (Excel)",
+                testTypeLabel: "Select Test Type:",
+                mannWhitneyOption: "Mann-Whitney U Test (Independent Samples)",
+                wilcoxonOption: "Wilcoxon Signed-Rank Test (Paired Samples)",
+                analyzeBtn: "Analyze Data",
+                resultsHeader: "Analysis Results",
+                exportBtn: "Export to Excel",
+                significant: "Significant",
+                notSignificant: "Not Significant",
+                noNumericData: "No numeric data found in column: ",
+                fileRequired: "Please upload both files",
+                sameVariables: "Files must have the same variables/columns",
+                noDataError: "No data to analyze",
+                mannWhitneyTitle: "Mann–Whitney U Test Results",
+                wilcoxonTitle: "Wilcoxon Signed-Rank Test Results",
+                meanComparison: "Mean Comparison",
+                controlMean: "Control Mean",
+                experimentalMean: "Experimental Mean",
+                mannWhitneyHeaders: ["Variables", "Groups", "N", "Mean Rank", "Sum of Ranks", "Mann–Whitney U", "Z", "**Asymp. Sig. (2-tailed)"],
+                wilcoxonHeaders1: ["Skills", "Measurement", "N", "Mean", "Negative Ranks", "Positive Ranks", "Z", "**.Sig"],
+                wilcoxonHeaders2: ["Mean Rank", "Sum of Ranks", "Mean Rank", "Sum of Ranks"]
+            },
+            ar: {
+                title: "أداة التحليل الإحصائي غير المعلمي",
+                uploadHeader: "تحميل ملفات البيانات",
+                controlLabel: "مجموعة التحكم/ما قبل الاختبار (إكسل)",
+                experimentalLabel: "المجموعة التجريبية/ما بعد الاختبار (إكسل)",
+                testTypeLabel: "اختر نوع الاختبار:",
+                mannWhitneyOption: "اختبار مان-ويتني يو (عينات مستقلة)",
+                wilcoxonOption: "اختبار ويلكوكسون للرتب الموقعة (عينات مترابطة)",
+                analyzeBtn: "تحليل البيانات",
+                resultsHeader: "نتائج التحليل",
+                exportBtn: "تصدير إلى إكسل",
+                significant: "دال إحصائياً",
+                notSignificant: "غير دال إحصائياً",
+                noNumericData: "لا توجد بيانات رقمية في العمود: ",
+                fileRequired: "يرجى تحميل كلا الملفين",
+                sameVariables: "يجب أن تحتوي الملفات على نفس المتغيرات/الأعمدة",
+                noDataError: "لا توجد بيانات للتحليل",
+                meanComparison: "مقارنة المتوسط",
+                controlMean: "متوسط التحكم",
+                experimentalMean: "متوسط التجريبي",
+                mannWhitneyTitle: "نتائج اختبار مان-ويتني يو",
+                wilcoxonTitle: "نتائج اختبار ويلكوكسون للرتب الموقعة",
+                mannWhitneyHeaders: ["المتغيرات", "المجموعات", "ن", "متوسط الرتب", "مجموع الرتب", "مان-ويتني يو", "ز", "**الدلالة الإحصائية (طرفان)"],
+                wilcoxonHeaders1: ["المهارات", "القياس", "ن", "المتوسط", "الرتب السالبة", "الرتب الموجبة", "ز", "**الدلالة"],
+                wilcoxonHeaders2: ["متوسط الرتب", "مجموع الرتب", "متوسط الرتب", "مجموع الرتب"]
+            }
+        };
+        // Current language
+        let currentLanguage = 'en';
+
+        // DOM elements
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const controlFileInput = document.getElementById('controlFile');
+        const experimentalFileInput = document.getElementById('experimentalFile');
+        const testTypeSelect = document.getElementById('testType');
+        const resultsSection = document.getElementById('resultsSection');
+        const mannWhitneyResults = document.getElementById('mannWhitneyResults');
+        const wilcoxonResults = document.getElementById('wilcoxonResults');
+        const mannWhitneyBody = document.getElementById('mannWhitneyBody');
+        const wilcoxonBody = document.getElementById('wilcoxonBody');
+        const exportBtn = document.getElementById('exportBtn');
+        const fileError = document.getElementById('fileError');
+        const languageButtons = document.querySelectorAll('.language-btn');
+
+        // Chart variables
+        let resultsChart = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up event listeners
+            analyzeBtn.addEventListener('click', analyzeData);
+            exportBtn.addEventListener('click', exportToExcel);
+
+            // Language switcher
+            languageButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    currentLanguage = this.getAttribute('data-lang');
+                    document.querySelector('.language-btn.active').classList.remove('active');
+                    this.classList.add('active');
+                    updateLanguage();
+                });
+            });
+
+            // Initial language update
+            updateLanguage();
+        });
+
+        // Update language
+        function updateLanguage() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                element.textContent = i18nContent[currentLanguage][key];
+            });
+
+            // Update table headers for Mann-Whitney
+            const mwHeaders = document.getElementById('mannWhitneyHeader').querySelectorAll('th');
+            i18nContent[currentLanguage].mannWhitneyHeaders.forEach((text, index) => {
+                mwHeaders[index].textContent = text;
+            });
+
+            // Update table headers for Wilcoxon
+            const wilcoxonHeader1 = document.getElementById('wilcoxonHeader1').querySelectorAll('th');
+            const wilcoxonHeader2 = document.getElementById('wilcoxonHeader2').querySelectorAll('th');
+            i18nContent[currentLanguage].wilcoxonHeaders1.forEach((text, index) => {
+                wilcoxonHeader1[index].textContent = text;
+            });
+            i18nContent[currentLanguage].wilcoxonHeaders2.forEach((text, index) => {
+                wilcoxonHeader2[index].textContent = text;
+            });
+
+            // Update chart if it exists
+            if (resultsChart) {
+                const testType = testTypeSelect.value;
+                resultsChart.options.plugins.title.text = i18nContent[currentLanguage].meanComparison;
+                resultsChart.options.datasets[0].label = i18nContent[currentLanguage].controlMean;
+                resultsChart.options.datasets[1].label = i18nContent[currentLanguage].experimentalMean;
+                resultsChart.options.scales.y.title.text = i18nContent[currentLanguage].meanComparison.split(" ")[0] + " Value";
+                resultsChart.update();
+            }
+        }
+
+        // Main analysis function
+        async function analyzeData() {
+            fileError.textContent = '';
+
+            // Check if files are uploaded
+            if (!controlFileInput.files.length || !experimentalFileInput.files.length) {
+                fileError.textContent = i18nContent[currentLanguage].fileRequired;
+                return;
+            }
+
+            try {
+                // Read both Excel files
+                const controlData = await readExcelFile(controlFileInput.files[0]);
+                const experimentalData = await readExcelFile(experimentalFileInput.files[0]);
+
+                // Check if files have the same variables
+                const controlVariables = Object.keys(controlData);
+                const experimentalVariables = Object.keys(experimentalData);
+
+                if (controlVariables.length === 0 || experimentalVariables.length === 0) {
+                    fileError.textContent = i18nContent[currentLanguage].noDataError;
+                    return;
+                }
+
+                // Find common variables with numeric data
+                const commonVariables = controlVariables.filter(variable =>
+                    experimentalVariables.includes(variable) &&
+                    isNumericData(controlData[variable]) &&
+                    isNumericData(experimentalData[variable])
+                );
+
+                if (commonVariables.length === 0) {
+                    fileError.textContent = i18nContent[currentLanguage].sameVariables;
+                    return;
+                }
+
+                // Perform selected test for each variable
+                const testType = testTypeSelect.value;
+                const results = [];
+                const chartData = {
+                    labels: [],
+                    controlMeans: [],
+                    experimentalMeans: []
+                };
+
+                commonVariables.forEach(variable => {
+                    const controlValues = controlData[variable];
+                    const experimentalValues = experimentalData[variable];
+
+                    // Clean data (remove non-numeric values)
+                    const cleanControl = controlValues.filter(val => typeof val === 'number' && !isNaN(val));
+                    const cleanExperimental = experimentalValues.filter(val => typeof val === 'number' && !isNaN(val));
+
+                    if (cleanControl.length === 0 || cleanExperimental.length === 0) {
+                        console.warn(i18nContent[currentLanguage].noNumericData + variable);
+                        return;
+                    }
+
+                    let testResult;
+
+                    if (testType === 'mann-whitney') {
+                        testResult = performMannWhitneyTest(cleanControl, cleanExperimental, variable);
+                    } else {
+                        testResult = performWilcoxonTest(cleanControl, cleanExperimental, variable);
+                    }
+
+                    results.push(testResult);
+
+                    // Prepare chart data using mean
+                    chartData.labels.push(variable);
+                    chartData.controlMeans.push(jStat.mean(cleanControl));
+                    chartData.experimentalMeans.push(jStat.mean(cleanExperimental));
+                });
+
+                // Display results
+                displayResults(results, testType);
+                createChart(chartData);
+                resultsSection.style.display = 'block';
+
+            } catch (error) {
+                console.error('Error during analysis:', error);
+                fileError.textContent = error.message || 'An error occurred during analysis';
+            }
+        }
+
+        // Read Excel file
+        async function readExcelFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheetName = workbook.SheetNames[0];
+                        const firstSheet = workbook.Sheets[firstSheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+                        if (jsonData.length < 2) {
+                            reject(new Error('File has no data rows'));
+                            return;
+                        }
+
+                        // Extract headers and data
+                        const headers = jsonData[0];
+                        const result = {};
+
+                        // Initialize result object with arrays for each column
+                        headers.forEach(header => {
+                            if (header) result[header] = [];
+                        });
+
+                        // Process each row of data
+                        for (let i = 1; i < jsonData.length; i++) {
+                            const row = jsonData[i];
+                            headers.forEach((header, index) => {
+                                if (header && index < row.length) {
+                                    const value = parseFloat(row[index]);
+                                    result[header].push(isNaN(value) ? row[index] : value);
+                                }
+                            });
+                        }
+
+                        resolve(result);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+
+                reader.onerror = function() {
+                    reject(new Error('Error reading file'));
+                };
+
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Check if array contains numeric data
+        function isNumericData(array) {
+            return array.some(val => typeof val === 'number' && !isNaN(val));
+        }
+
+        // Helper function to calculate sum of (f^3 - f) for tie correction
+        function calculateTieCorrectionSum(data) {
+            const counts = {};
+            data.forEach(val => {
+                counts[val] = (counts[val] || 0) + 1;
+            });
+
+            let tieCorrectionSum = 0;
+            for (const val in counts) {
+                const f = counts[val];
+                if (f > 1) {
+                    tieCorrectionSum += (f * f * f - f);
+                }
+            }
+            return tieCorrectionSum;
+        }
+
+        // Perform Mann-Whitney U test
+        function performMannWhitneyTest(control, experimental, variable) {
+            // Combine and rank all values
+            const combined = [...control.map(val => ({ value: val, group: 'control' })),
+                            ...experimental.map(val => ({ value: val, group: 'experimental' }))];
+
+            // Sort by value
+            combined.sort((a, b) => a.value - b.value);
+
+            // Assign ranks, handling ties
+            let rank = 1;
+            for (let i = 0; i < combined.length; i++) {
+                if (i > 0 && combined[i].value !== combined[i-1].value) {
+                    rank = i + 1;
+                }
+
+                // Find how many ties there are for this value
+                let ties = 0;
+                for (let j = i; j < combined.length && combined[j].value === combined[i].value; j++) {
+                    ties++;
+                }
+
+                // Assign average rank to all tied values
+                const averageRank = rank + (ties - 1) / 2;
+                for (let j = 0; j < ties; j++) {
+                    combined[i + j].rank = averageRank;
+                }
+
+                i += ties - 1;
+                rank += ties;
+            }
+
+            // Calculate sum of ranks for each group
+            const sumControlRanks = combined.filter(item => item.group === 'control')
+                                            .reduce((sum, item) => sum + item.rank, 0);
+            const sumExperimentalRanks = combined.filter(item => item.group === 'experimental')
+                                                    .reduce((sum, item) => sum + item.rank, 0);
+
+            // Calculate U values
+            const n1 = control.length;
+            const n2 = experimental.length;
+            const N = n1 + n2; // Total sample size
+            const U1 = sumControlRanks - (n1 * (n1 + 1)) / 2;
+            const U2 = sumExperimentalRanks - (n2 * (n2 + 1)) / 2;
+
+            // Use the smaller U value
+            const U = Math.min(U1, U2);
+
+            // Calculate expected value
+            const expected = (n1 * n2) / 2;
+
+            // Calculate tie correction sum for combined ranks
+            const combinedValues = combined.map(item => item.value);
+            const tieCorrectionSum = calculateTieCorrectionSum(combinedValues);
+
+            // Calculate standard deviation with tie correction [2]
+            let variance;
+            if (N > 1) { // Avoid division by zero if N is 0 or 1
+                variance = (n1 * n2 * (N + 1) / 12) * (1 - tieCorrectionSum / (N * N * N - N));
+            } else {
+                variance = 0; // No variance for very small N
+            }
+            const stdDev = Math.sqrt(variance);
+
+            // Calculate Z-score without continuity correction [8, 3, 4]
+            let Z = 0;
+            if (stdDev > 0) {
+                Z = (U - expected) / stdDev;
+            }
+
+            return {
+                variable,
+                n1,
+                n2,
+                mean1: jStat.mean(control),
+                mean2: jStat.mean(experimental),
+                meanRank1: sumControlRanks / n1,
+                meanRank2: sumExperimentalRanks / n2,
+                sumRanks1: sumControlRanks,
+                sumRanks2: sumExperimentalRanks,
+                statistic: U,
+                z: Z,
+                p: 2 * (1 - jStat.normal.cdf(Math.abs(Z), 0, 1)), // Two-tailed p-value
+                significant: (2 * (1 - jStat.normal.cdf(Math.abs(Z), 0, 1))) < 0.05,
+                testType: 'Mann-Whitney U'
+            };
+        }
+
+        // Perform Wilcoxon signed-rank test
+        function performWilcoxonTest(control, experimental, variable) {
+            if (control.length !== experimental.length) {
+                throw new Error('For Wilcoxon test, paired samples must have the same length');
+            }
+
+            // Calculate differences
+            const differences = [];
+            for (let i = 0; i < control.length; i++) {
+                differences.push(experimental[i] - control[i]);
+            }
+
+            // Filter out zero differences [5, 6, 7]
+            const nonZeroDifferences = differences.filter(d => d !== 0);
+
+            // If no non-zero differences, cannot perform test
+            if (nonZeroDifferences.length === 0) {
+                return {
+                    variable,
+                    n1: control.length, // Original sample size
+                    n2: experimental.length, // Original sample size
+                    mean1: jStat.mean(control),
+                    mean2: jStat.mean(experimental),
+                    meanRankPlus: 0,
+                    meanRankMinus: 0,
+                    sumRanksPlus: 0,
+                    sumRanksMinus: 0,
+                    statistic: 0,
+                    z: 0,
+                    p: 1, // Not significant if no differences
+                    significant: false,
+                    testType: 'Wilcoxon Signed-Rank'
+                };
+            }
+
+            // Absolute differences and their signs
+            const absDifferences = nonZeroDifferences.map(d => Math.abs(d));
+            const signs = nonZeroDifferences.map(d => Math.sign(d));
+
+            // Create array of objects with absolute difference and sign
+            const diffObjects = absDifferences.map((d, i) => ({
+                absDiff: d,
+                sign: signs[i]
+            }));
+
+            // Sort by absolute difference
+            diffObjects.sort((a, b) => a.absDiff - b.absDiff);
+
+            // Assign ranks (handling ties)
+            let rank = 1;
+            for (let i = 0; i < diffObjects.length; i++) {
+                if (i > 0 && diffObjects[i].absDiff !== diffObjects[i-1].absDiff) {
+                    rank = i + 1;
+                }
+
+                // Find how many ties there are for this value
+                let ties = 0;
+                for (let j = i; j < diffObjects.length && diffObjects[j].absDiff === diffObjects[i].absDiff; j++) {
+                    ties++;
+                }
+
+                // Assign average rank to all tied values
+                const averageRank = rank + (ties - 1) / 2;
+                for (let j = 0; j < ties; j++) {
+                    diffObjects[i + j].rank = averageRank;
+                }
+
+                i += ties - 1;
+                rank += ties;
+            }
+
+            // Calculate sum of ranks for positive and negative differences
+            let W_plus = 0;
+            let W_minus = 0;
+            let count_plus = 0;
+            let count_minus = 0;
+
+            diffObjects.forEach(d => {
+                if (d.sign > 0) {
+                    W_plus += d.rank;
+                    count_plus++;
+                } else {
+                    W_minus += d.rank;
+                    count_minus++;
+                }
+            });
+
+            // W statistic is the smaller of W+ and W-
+            const W = Math.min(W_plus, W_minus);
+            const n = nonZeroDifferences.length; // n is the number of non-zero differences [9, 10]
+
+            // Calculate expected mean [11, 10]
+            const expected = (n * (n + 1)) / 4;
+
+            // Calculate tie correction sum for absolute differences [12, 13, 9, 11, 14, 10, 15]
+            const tieCorrectionSum = calculateTieCorrectionSum(absDifferences);
+
+            // Calculate standard deviation with tie correction [12, 13, 9, 11, 14, 10, 15]
+            let variance = (n * (n + 1) * (2 * n + 1)) / 24;
+            if (tieCorrectionSum > 0) {
+                variance -= (tieCorrectionSum / 48);
+            }
+            const stdDev = Math.sqrt(Math.max(0, variance)); // Ensure variance is not negative due to floating point issues
+
+            // Calculate Z-score without continuity correction [1, 2, 4]
+            let Z = 0;
+            if (stdDev > 0) {
+                Z = (W - expected) / stdDev;
+            }
+
+            return {
+                variable,
+                n1: control.length, // Original sample size
+                n2: experimental.length, // Original sample size
+                mean1: jStat.mean(control),
+                mean2: jStat.mean(experimental),
+                meanRankPlus: count_plus > 0 ? W_plus / count_plus : 0,
+                meanRankMinus: count_minus > 0 ? W_minus / count_minus : 0,
+                sumRanksPlus: W_plus,
+                sumRanksMinus: W_minus,
+                statistic: W,
+                z: Z,
+                p: 2 * (1 - jStat.normal.cdf(Math.abs(Z), 0, 1)), // Two-tailed p-value
+                significant: (2 * (1 - jStat.normal.cdf(Math.abs(Z), 0, 1))) < 0.05,
+                testType: 'Wilcoxon Signed-Rank'
+            };
+        }
+
+        // Display results in appropriate table format
+        function displayResults(results, testType) {
+            // Clear previous results
+            mannWhitneyBody.innerHTML = '';
+            wilcoxonBody.innerHTML = '';
+
+            // Show/hide appropriate tables
+            if (testType === 'mann-whitney') {
+                mannWhitneyResults.style.display = 'block';
+                wilcoxonResults.style.display = 'none';
+
+                results.forEach(result => {
+                    // Create row for group 1
+                    const row1 = document.createElement('tr');
+                    row1.classList.add('group-1');
+
+                    // Variables column (new)
+                    const varCell = document.createElement('td');
+                    varCell.textContent = result.variable;
+                    varCell.rowSpan = 2; // Span across both group rows
+                    row1.appendChild(varCell);
+
+                    // Group label
+                    const groupCell1 = document.createElement('td');
+                    groupCell1.textContent = '1.00';
+                    row1.appendChild(groupCell1);
+
+                    // Sample size
+                    const nCell1 = document.createElement('td');
+                    nCell1.textContent = result.n1;
+                    row1.appendChild(nCell1);
+
+                    // Mean Rank
+                    const meanRankCell1 = document.createElement('td');
+                    meanRankCell1.textContent = result.meanRank1.toFixed(2);
+                    row1.appendChild(meanRankCell1);
+
+                    // Sum of Ranks
+                    const sumRanksCell1 = document.createElement('td');
+                    sumRanksCell1.textContent = result.sumRanks1.toFixed(2);
+                    row1.appendChild(sumRanksCell1);
+
+                    // Test Statistics (only show in first row)
+                    const statCell1 = document.createElement('td');
+                    statCell1.textContent = result.statistic.toFixed(2);
+                    statCell1.rowSpan = 2;
+                    row1.appendChild(statCell1);
+
+                    const zCell1 = document.createElement('td');
+                    zCell1.textContent = result.z.toFixed(2);
+                    zCell1.rowSpan = 2;
+                    row1.appendChild(zCell1);
+
+                    const sigCell1 = document.createElement('td');
+                    sigCell1.textContent = result.p < 0.001 ? '0**' :
+                                             result.p < 0.01 ? result.p.toFixed(3) + '**' :
+                                             result.p < 0.05 ? result.p.toFixed(3) + '*' :
+                                             result.p.toFixed(3);
+                    sigCell1.rowSpan = 2;
+                    sigCell1.classList.add('sig-cell');
+                    if (result.p < 0.05) sigCell1.classList.add('sig-0');
+                    row1.appendChild(sigCell1);
+
+                    mannWhitneyBody.appendChild(row1);
+
+                    // Create row for group 2
+                    const row2 = document.createElement('tr');
+                    row2.classList.add('group-2');
+
+                    // Group label
+                    const groupCell2 = document.createElement('td');
+                    groupCell2.textContent = '2.00';
+                    row2.appendChild(groupCell2);
+
+                    // Sample size
+                    const nCell2 = document.createElement('td');
+                    nCell2.textContent = result.n2;
+                    row2.appendChild(nCell2);
+
+                    // Mean Rank
+                    const meanRankCell2 = document.createElement('td');
+                    meanRankCell2.textContent = result.meanRank2.toFixed(2);
+                    row2.appendChild(meanRankCell2);
+
+                    // Sum of Ranks
+                    const sumRanksCell2 = document.createElement('td');
+                    sumRanksCell2.textContent = result.sumRanks2.toFixed(2);
+                    row2.appendChild(sumRanksCell2);
+
+                    mannWhitneyBody.appendChild(row2);
+                });
+            } else {
+                mannWhitneyResults.style.display = 'none';
+                wilcoxonResults.style.display = 'block';
+
+                results.forEach(result => {
+                    // Create row for the "Pre" group
+                    const row1 = document.createElement('tr');
+                    row1.classList.add('group-1');
+
+                    // Skills (variable name), spans two rows
+                    const skillsCell = document.createElement('td');
+                    skillsCell.textContent = result.variable;
+                    skillsCell.rowSpan = 2;
+                    row1.appendChild(skillsCell);
+
+                    // Measurement label for "Pre"
+                    const measurementCell1 = document.createElement('td');
+                    measurementCell1.textContent = 'Pre';
+                    row1.appendChild(measurementCell1);
+
+                    // Sample size (N), spans two rows
+                    const nCell = document.createElement('td');
+                    nCell.textContent = result.n1;
+                    nCell.rowSpan = 2;
+                    row1.appendChild(nCell);
+
+                    // Mean for "Pre"
+                    const meanCell1 = document.createElement('td');
+                    meanCell1.textContent = result.mean1.toFixed(2);
+                    row1.appendChild(meanCell1);
+
+                    // Negative Ranks - Mean Rank, spans two rows
+                    const negMeanRankCell = document.createElement('td');
+                    negMeanRankCell.textContent = result.meanRankMinus.toFixed(2);
+                    negMeanRankCell.rowSpan = 2;
+                    row1.appendChild(negMeanRankCell);
+
+                    // Negative Ranks - Sum of Ranks, spans two rows
+                    const negSumRanksCell = document.createElement('td');
+                    negSumRanksCell.textContent = result.sumRanksMinus.toFixed(2);
+                    negSumRanksCell.rowSpan = 2;
+                    row1.appendChild(negSumRanksCell);
+
+                    // Positive Ranks - Mean Rank, spans two rows
+                    const posMeanRankCell = document.createElement('td');
+                    posMeanRankCell.textContent = result.meanRankPlus.toFixed(2);
+                    posMeanRankCell.rowSpan = 2;
+                    row1.appendChild(posMeanRankCell);
+
+                    // Positive Ranks - Sum of Ranks, spans two rows
+                    const posSumRanksCell = document.createElement('td');
+                    posSumRanksCell.textContent = result.sumRanksPlus.toFixed(2);
+                    posSumRanksCell.rowSpan = 2;
+                    row1.appendChild(posSumRanksCell);
+
+                    // Z-value, spans two rows
+                    const zCell = document.createElement('td');
+                    zCell.textContent = result.z.toFixed(2);
+                    zCell.rowSpan = 2;
+                    row1.appendChild(zCell);
+
+                    // Significance with asterisks, spans two rows
+                    const sigCell = document.createElement('td');
+                    sigCell.textContent = result.p < 0.001 ? '0**' :
+                                            result.p < 0.01 ? result.p.toFixed(3) + '**' :
+                                            result.p < 0.05 ? result.p.toFixed(3) + '*' :
+                                            result.p.toFixed(3);
+                    sigCell.rowSpan = 2;
+                    sigCell.classList.add('sig-cell');
+                    if (result.p < 0.05) sigCell.classList.add('sig-0');
+                    row1.appendChild(sigCell);
+
+                    wilcoxonBody.appendChild(row1);
+
+                    // Create row for the "Post" group
+                    const row2 = document.createElement('tr');
+                    row2.classList.add('group-2');
+
+                    // Measurement label for "Post"
+                    const measurementCell2 = document.createElement('td');
+                    measurementCell2.textContent = 'Post';
+                    row2.appendChild(measurementCell2);
+
+                    // Mean for "Post"
+                    const meanCell2 = document.createElement('td');
+                    meanCell2.textContent = result.mean2.toFixed(2);
+                    row2.appendChild(meanCell2);
+
+                    wilcoxonBody.appendChild(row2);
+                });
+            }
+        }
+
+        // Create Chart from analysis data
+        function createChart(data) {
+            if (resultsChart) {
+                resultsChart.destroy();
+            }
+
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+            const testType = testTypeSelect.value;
+            resultsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: i18nContent[currentLanguage].controlMean,
+                        data: data.controlMeans,
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: i18nContent[currentLanguage].experimentalMean,
+                        data: data.experimentalMeans,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: i18nContent[currentLanguage].meanComparison
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Variables'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: i18nContent[currentLanguage].meanComparison.split(" ")[0] + " Value"
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Export table data to an Excel file
+        function exportToExcel() {
+            // Determine which table is visible
+            let tableToExport;
+            const testType = testTypeSelect.value;
+            if (testType === 'mann-whitney') {
+                tableToExport = document.getElementById('mannWhitneyTable');
+            } else if (testType === 'wilcoxon') {
+                tableToExport = document.getElementById('wilcoxonTable');
+            }
+
+            if (tableToExport) {
+                // Create a workbook from the HTML table element
+                const workbook = XLSX.utils.table_to_book(tableToExport, {sheet: "Analysis Results"});
+
+                // Write and download the file
+                const filename = `${testType}_results.xlsx`;
+                XLSX.writeFile(workbook, filename);
+            }
+        }
+    </script>
+</body>
+</html>
