@@ -97,10 +97,10 @@
         </div>
         <div class="logo-container">
             <!-- Placeholder for 00.png -->
-            <img src="00.png" alt="Tool Logo" class="logo-img">
+            <img src="https://placehold.co/80x80/E0E0E0/333333?text=Logo" alt="Tool Logo" class="logo-img">
         </div>
         <h1 class="text-center mb-0" data-i18n="title">Non-Parametric Statistical Analysis Tool</h1>
-        <h2 class="text-center h5 text-muted mt-2 mb-4">Developed by Dr. Mazen Badawy – Doctorate of English Instruction & Testing</h2>
+        <h2 class="text-center h5 text-muted mt-2 mb-4">Developed by Dr. Mazen Badawy – Doctorate of TEFL</h2>
 
         <div class="card mb-4">
             <div class="card-header" data-i18n="uploadHeader">Upload Data Files</div>
@@ -125,8 +125,10 @@
                         </select>
                     </div>
                 </div>
-
-                <button id="analyzeBtn" class="btn btn-primary" data-i18n="analyzeBtn">Analyze Data</button>
+                <div class="d-flex gap-2">
+                    <button id="analyzeBtn" class="btn btn-primary" data-i18n="analyzeBtn">Analyze Data</button>
+                    <button id="downloadTemplateBtn" class="btn btn-secondary btn-sm" data-i18n="downloadTemplateBtn">Download Template</button>
+                </div>
                 <div id="fileError" class="text-danger mt-2"></div>
             </div>
         </div>
@@ -155,6 +157,7 @@
                                             <th>Mann–Whitney U</th>
                                             <th>Z</th>
                                             <th>**Asymp. Sig. (2-tailed)</th>
+                                            <th>Significance</th> <!-- New column header -->
                                         </tr>
                                     </thead>
                                     <tbody id="mannWhitneyBody">
@@ -177,6 +180,7 @@
                                             <th colspan="2" class="positive-ranks">Positive Ranks</th>
                                             <th rowspan="2">Z</th>
                                             <th rowspan="2">**.Sig</th>
+                                            <th rowspan="2">Significance</th> <!-- New column header -->
                                         </tr>
                                         <tr id="wilcoxonHeader2">
                                             <th class="sub-header negative-ranks">Mean Rank</th>
@@ -190,8 +194,10 @@
                                 </table>
                             </div>
                         </div>
-
-                        <button id="exportBtn" class="btn btn-success mt-3" data-i18n="exportBtn">Export to Excel</button>
+                        <div class="d-flex justify-content-end gap-2 mt-3">
+                            <button id="copyTableBtn" class="btn btn-success" data-i18n="copyTableBtn">Copy Table</button>
+                            <button id="exportBtn" class="btn btn-primary" data-i18n="exportBtn">Export to Excel</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -213,8 +219,11 @@
                 mannWhitneyOption: "Mann-Whitney U Test (Independent Samples)",
                 wilcoxonOption: "Wilcoxon Signed-Rank Test (Paired Samples)",
                 analyzeBtn: "Analyze Data",
+                downloadTemplateBtn: "Download Template", // New translation
                 resultsHeader: "Analysis Results",
                 exportBtn: "Export to Excel",
+                copyTableBtn: "Copy Table",
+                tableCopied: "Table copied!",
                 significant: "Significant",
                 notSignificant: "Not Significant",
                 noNumericData: "No numeric data found in column: ",
@@ -226,8 +235,8 @@
                 meanComparison: "Mean Comparison",
                 controlMean: "Control Mean",
                 experimentalMean: "Experimental Mean",
-                mannWhitneyHeaders: ["Variables", "Groups", "N", "Mean Rank", "Sum of Ranks", "Mann–Whitney U", "Z", "**Asymp. Sig. (2-tailed)"],
-                wilcoxonHeaders1: ["Skills", "Measurement", "N", "Mean", "Negative Ranks", "Positive Ranks", "Z", "**.Sig"],
+                mannWhitneyHeaders: ["Variables", "Groups", "N", "Mean Rank", "Sum of Ranks", "Mann–Whitney U", "Z", "**Asymp. Sig. (2-tailed)", "Significance"],
+                wilcoxonHeaders1: ["Skills", "Measurement", "N", "Mean", "Negative Ranks", "Positive Ranks", "Z", "**.Sig", "Significance"],
                 wilcoxonHeaders2: ["Mean Rank", "Sum of Ranks", "Mean Rank", "Sum of Ranks"]
             },
             ar: {
@@ -239,8 +248,11 @@
                 mannWhitneyOption: "اختبار مان-ويتني يو (عينات مستقلة)",
                 wilcoxonOption: "اختبار ويلكوكسون للرتب الموقعة (عينات مترابطة)",
                 analyzeBtn: "تحليل البيانات",
+                downloadTemplateBtn: "تحميل القالب", // New translation
                 resultsHeader: "نتائج التحليل",
                 exportBtn: "تصدير إلى إكسل",
+                copyTableBtn: "نسخ الجدول",
+                tableCopied: "تم نسخ الجدول!",
                 significant: "دال إحصائياً",
                 notSignificant: "غير دال إحصائياً",
                 noNumericData: "لا توجد بيانات رقمية في العمود: ",
@@ -252,8 +264,8 @@
                 experimentalMean: "متوسط التجريبي",
                 mannWhitneyTitle: "نتائج اختبار مان-ويتني يو",
                 wilcoxonTitle: "نتائج اختبار ويلكوكسون للرتب الموقعة",
-                mannWhitneyHeaders: ["المتغيرات", "المجموعات", "ن", "متوسط الرتب", "مجموع الرتب", "مان-ويتني يو", "ز", "**الدلالة الإحصائية (طرفان)"],
-                wilcoxonHeaders1: ["المهارات", "القياس", "ن", "المتوسط", "الرتب السالبة", "الرتب الموجبة", "ز", "**الدلالة"],
+                mannWhitneyHeaders: ["المتغيرات", "المجموعات", "ن", "متوسط الرتب", "مجموع الرتب", "مان-ويتني يو", "ز", "**الدلالة الإحصائية (طرفان)", "الدلالة"],
+                wilcoxonHeaders1: ["المهارات", "القياس", "ن", "المتوسط", "الرتب السالبة", "الرتب الموجبة", "ز", "**الدلالة", "الدلالة"],
                 wilcoxonHeaders2: ["متوسط الرتب", "مجموع الرتب", "متوسط الرتب", "مجموع الرتب"]
             }
         };
@@ -271,6 +283,8 @@
         const mannWhitneyBody = document.getElementById('mannWhitneyBody');
         const wilcoxonBody = document.getElementById('wilcoxonBody');
         const exportBtn = document.getElementById('exportBtn');
+        const copyTableBtn = document.getElementById('copyTableBtn'); // New copy button
+        const downloadTemplateBtn = document.getElementById('downloadTemplateBtn'); // New download template button
         const fileError = document.getElementById('fileError');
         const languageButtons = document.querySelectorAll('.language-btn');
 
@@ -282,6 +296,8 @@
             // Set up event listeners
             analyzeBtn.addEventListener('click', analyzeData);
             exportBtn.addEventListener('click', exportToExcel);
+            copyTableBtn.addEventListener('click', copyDisplayedTable); // Event listener for copy button
+            downloadTemplateBtn.addEventListener('click', downloadTemplate); // Event listener for download template button
 
             // Language switcher
             languageButtons.forEach(btn => {
@@ -307,25 +323,29 @@
             // Update table headers for Mann-Whitney
             const mwHeaders = document.getElementById('mannWhitneyHeader').querySelectorAll('th');
             i18nContent[currentLanguage].mannWhitneyHeaders.forEach((text, index) => {
-                mwHeaders[index].textContent = text;
+                if (mwHeaders[index]) mwHeaders[index].textContent = text;
             });
 
             // Update table headers for Wilcoxon
             const wilcoxonHeader1 = document.getElementById('wilcoxonHeader1').querySelectorAll('th');
             const wilcoxonHeader2 = document.getElementById('wilcoxonHeader2').querySelectorAll('th');
             i18nContent[currentLanguage].wilcoxonHeaders1.forEach((text, index) => {
-                wilcoxonHeader1[index].textContent = text;
+                if (wilcoxonHeader1[index]) wilcoxonHeader1[index].textContent = text;
             });
             i18nContent[currentLanguage].wilcoxonHeaders2.forEach((text, index) => {
-                wilcoxonHeader2[index].textContent = text;
+                if (wilcoxonHeader2[index]) wilcoxonHeader2[index].textContent = text;
             });
 
             // Update chart if it exists
             if (resultsChart) {
-                const testType = testTypeSelect.value;
-                resultsChart.options.plugins.title.text = i18nContent[currentLanguage].meanComparison;
-                resultsChart.options.datasets[0].label = i18nContent[currentLanguage].controlMean;
-                resultsChart.options.datasets[1].label = i18nContent[currentLanguage].experimentalMean;
+                // Check if datasets[0] and datasets[1] exist before trying to access their properties
+                if (resultsChart.data.datasets[0]) {
+                    resultsChart.options.plugins.title.text = i18nContent[currentLanguage].meanComparison;
+                    resultsChart.data.datasets[0].label = i18nContent[currentLanguage].controlMean;
+                }
+                if (resultsChart.data.datasets[1]) {
+                    resultsChart.data.datasets[1].label = i18nContent[currentLanguage].experimentalMean;
+                }
                 resultsChart.options.scales.y.title.text = i18nContent[currentLanguage].meanComparison.split(" ")[0] + " Value";
                 resultsChart.update();
             }
@@ -494,7 +514,7 @@
         function performMannWhitneyTest(control, experimental, variable) {
             // Combine and rank all values
             const combined = [...control.map(val => ({ value: val, group: 'control' })),
-                            ...experimental.map(val => ({ value: val, group: 'experimental' }))];
+                                ...experimental.map(val => ({ value: val, group: 'experimental' }))];
 
             // Sort by value
             combined.sort((a, b) => a.value - b.value);
@@ -524,9 +544,9 @@
 
             // Calculate sum of ranks for each group
             const sumControlRanks = combined.filter(item => item.group === 'control')
-                                            .reduce((sum, item) => sum + item.rank, 0);
+                                        .reduce((sum, item) => sum + item.rank, 0);
             const sumExperimentalRanks = combined.filter(item => item.group === 'experimental')
-                                                    .reduce((sum, item) => sum + item.rank, 0);
+                                                 .reduce((sum, item) => sum + item.rank, 0);
 
             // Calculate U values
             const n1 = control.length;
@@ -718,203 +738,104 @@
                 wilcoxonResults.style.display = 'none';
 
                 results.forEach(result => {
+                    const significanceText = result.significant ? i18nContent[currentLanguage].significant : i18nContent[currentLanguage].notSignificant;
+                    const sigClass = result.significant ? 'sig-0' : '';
+
                     // Create row for group 1
                     const row1 = document.createElement('tr');
                     row1.classList.add('group-1');
-
-                    // Variables column (new)
-                    const varCell = document.createElement('td');
-                    varCell.textContent = result.variable;
-                    varCell.rowSpan = 2; // Span across both group rows
-                    row1.appendChild(varCell);
-
-                    // Group label
-                    const groupCell1 = document.createElement('td');
-                    groupCell1.textContent = '1.00';
-                    row1.appendChild(groupCell1);
-
-                    // Sample size
-                    const nCell1 = document.createElement('td');
-                    nCell1.textContent = result.n1;
-                    row1.appendChild(nCell1);
-
-                    // Mean Rank
-                    const meanRankCell1 = document.createElement('td');
-                    meanRankCell1.textContent = result.meanRank1.toFixed(2);
-                    row1.appendChild(meanRankCell1);
-
-                    // Sum of Ranks
-                    const sumRanksCell1 = document.createElement('td');
-                    sumRanksCell1.textContent = result.sumRanks1.toFixed(2);
-                    row1.appendChild(sumRanksCell1);
-
-                    // Test Statistics (only show in first row)
-                    const statCell1 = document.createElement('td');
-                    statCell1.textContent = result.statistic.toFixed(2);
-                    statCell1.rowSpan = 2;
-                    row1.appendChild(statCell1);
-
-                    const zCell1 = document.createElement('td');
-                    zCell1.textContent = result.z.toFixed(2);
-                    zCell1.rowSpan = 2;
-                    row1.appendChild(zCell1);
-
-                    const sigCell1 = document.createElement('td');
-                    sigCell1.textContent = result.p < 0.001 ? '0**' :
-                                             result.p < 0.01 ? result.p.toFixed(3) + '**' :
-                                             result.p < 0.05 ? result.p.toFixed(3) + '*' :
-                                             result.p.toFixed(3);
-                    sigCell1.rowSpan = 2;
-                    sigCell1.classList.add('sig-cell');
-                    if (result.p < 0.05) sigCell1.classList.add('sig-0');
-                    row1.appendChild(sigCell1);
-
+                    row1.innerHTML = `
+                        <td rowspan="2">${result.variable}</td>
+                        <td>Control Group</td>
+                        <td>${result.n1}</td>
+                        <td>${result.meanRank1.toFixed(2)}</td>
+                        <td>${result.sumRanks1.toFixed(2)}</td>
+                        <td rowspan="2">${result.statistic.toFixed(2)}</td>
+                        <td rowspan="2">${result.z.toFixed(2)}</td>
+                        <td rowspan="2" class="sig-cell ${sigClass}">${result.p.toFixed(3)}</td>
+                        <td rowspan="2">${significanceText}</td>
+                    `;
                     mannWhitneyBody.appendChild(row1);
 
                     // Create row for group 2
                     const row2 = document.createElement('tr');
                     row2.classList.add('group-2');
-
-                    // Group label
-                    const groupCell2 = document.createElement('td');
-                    groupCell2.textContent = '2.00';
-                    row2.appendChild(groupCell2);
-
-                    // Sample size
-                    const nCell2 = document.createElement('td');
-                    nCell2.textContent = result.n2;
-                    row2.appendChild(nCell2);
-
-                    // Mean Rank
-                    const meanRankCell2 = document.createElement('td');
-                    meanRankCell2.textContent = result.meanRank2.toFixed(2);
-                    row2.appendChild(meanRankCell2);
-
-                    // Sum of Ranks
-                    const sumRanksCell2 = document.createElement('td');
-                    sumRanksCell2.textContent = result.sumRanks2.toFixed(2);
-                    row2.appendChild(sumRanksCell2);
-
+                    row2.innerHTML = `
+                        <td>Experimental Group</td>
+                        <td>${result.n2}</td>
+                        <td>${result.meanRank2.toFixed(2)}</td>
+                        <td>${result.sumRanks2.toFixed(2)}</td>
+                    `;
                     mannWhitneyBody.appendChild(row2);
                 });
-            } else {
+            } else { // Wilcoxon
                 mannWhitneyResults.style.display = 'none';
                 wilcoxonResults.style.display = 'block';
 
                 results.forEach(result => {
-                    // Create row for the "Pre" group
+                    const significanceText = result.significant ? i18nContent[currentLanguage].significant : i18nContent[currentLanguage].notSignificant;
+                    const sigClass = result.significant ? 'sig-0' : '';
+
                     const row1 = document.createElement('tr');
-                    row1.classList.add('group-1');
-
-                    // Skills (variable name), spans two rows
-                    const skillsCell = document.createElement('td');
-                    skillsCell.textContent = result.variable;
-                    skillsCell.rowSpan = 2;
-                    row1.appendChild(skillsCell);
-
-                    // Measurement label for "Pre"
-                    const measurementCell1 = document.createElement('td');
-                    measurementCell1.textContent = 'Pre';
-                    row1.appendChild(measurementCell1);
-
-                    // Sample size (N), spans two rows
-                    const nCell = document.createElement('td');
-                    nCell.textContent = result.n1;
-                    nCell.rowSpan = 2;
-                    row1.appendChild(nCell);
-
-                    // Mean for "Pre"
-                    const meanCell1 = document.createElement('td');
-                    meanCell1.textContent = result.mean1.toFixed(2);
-                    row1.appendChild(meanCell1);
-
-                    // Negative Ranks - Mean Rank, spans two rows
-                    const negMeanRankCell = document.createElement('td');
-                    negMeanRankCell.textContent = result.meanRankMinus.toFixed(2);
-                    negMeanRankCell.rowSpan = 2;
-                    row1.appendChild(negMeanRankCell);
-
-                    // Negative Ranks - Sum of Ranks, spans two rows
-                    const negSumRanksCell = document.createElement('td');
-                    negSumRanksCell.textContent = result.sumRanksMinus.toFixed(2);
-                    negSumRanksCell.rowSpan = 2;
-                    row1.appendChild(negSumRanksCell);
-
-                    // Positive Ranks - Mean Rank, spans two rows
-                    const posMeanRankCell = document.createElement('td');
-                    posMeanRankCell.textContent = result.meanRankPlus.toFixed(2);
-                    posMeanRankCell.rowSpan = 2;
-                    row1.appendChild(posMeanRankCell);
-
-                    // Positive Ranks - Sum of Ranks, spans two rows
-                    const posSumRanksCell = document.createElement('td');
-                    posSumRanksCell.textContent = result.sumRanksPlus.toFixed(2);
-                    posSumRanksCell.rowSpan = 2;
-                    row1.appendChild(posSumRanksCell);
-
-                    // Z-value, spans two rows
-                    const zCell = document.createElement('td');
-                    zCell.textContent = result.z.toFixed(2);
-                    zCell.rowSpan = 2;
-                    row1.appendChild(zCell);
-
-                    // Significance with asterisks, spans two rows
-                    const sigCell = document.createElement('td');
-                    sigCell.textContent = result.p < 0.001 ? '0**' :
-                                            result.p < 0.01 ? result.p.toFixed(3) + '**' :
-                                            result.p < 0.05 ? result.p.toFixed(3) + '*' :
-                                            result.p.toFixed(3);
-                    sigCell.rowSpan = 2;
-                    sigCell.classList.add('sig-cell');
-                    if (result.p < 0.05) sigCell.classList.add('sig-0');
-                    row1.appendChild(sigCell);
-
+                    row1.innerHTML = `
+                        <td>${result.variable}</td>
+                        <td>Pre-Test</td>
+                        <td>${result.n1}</td>
+                        <td>${result.mean1.toFixed(2)}</td>
+                        <td class="negative-ranks">${result.meanRankMinus.toFixed(2)}</td>
+                        <td class="negative-ranks">${result.sumRanksMinus.toFixed(2)}</td>
+                        <td class="positive-ranks">${result.meanRankPlus.toFixed(2)}</td>
+                        <td class="positive-ranks">${result.sumRanksPlus.toFixed(2)}</td>
+                        <td>${result.z.toFixed(2)}</td>
+                        <td class="sig-cell ${sigClass}">${result.p.toFixed(3)}</td>
+                        <td>${significanceText}</td>
+                    `;
                     wilcoxonBody.appendChild(row1);
 
-                    // Create row for the "Post" group
                     const row2 = document.createElement('tr');
-                    row2.classList.add('group-2');
-
-                    // Measurement label for "Post"
-                    const measurementCell2 = document.createElement('td');
-                    measurementCell2.textContent = 'Post';
-                    row2.appendChild(measurementCell2);
-
-                    // Mean for "Post"
-                    const meanCell2 = document.createElement('td');
-                    meanCell2.textContent = result.mean2.toFixed(2);
-                    row2.appendChild(meanCell2);
-
+                    row2.innerHTML = `
+                        <td></td>
+                        <td>Post-Test</td>
+                        <td>${result.n2}</td>
+                        <td>${result.mean2.toFixed(2)}</td>
+                        <td colspan="4"></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    `;
                     wilcoxonBody.appendChild(row2);
                 });
             }
         }
 
-        // Create Chart from analysis data
-        function createChart(data) {
+        // Create or update chart
+        function createChart(chartData) {
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+
             if (resultsChart) {
-                resultsChart.destroy();
+                resultsChart.destroy(); // Destroy existing chart before creating a new one
             }
 
-            const ctx = document.getElementById('resultsChart').getContext('2d');
-            const testType = testTypeSelect.value;
             resultsChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: data.labels,
-                    datasets: [{
-                        label: i18nContent[currentLanguage].controlMean,
-                        data: data.controlMeans,
-                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
-                    }, {
-                        label: i18nContent[currentLanguage].experimentalMean,
-                        data: data.experimentalMeans,
-                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }]
+                    labels: chartData.labels,
+                    datasets: [
+                        {
+                            label: i18nContent[currentLanguage].controlMean,
+                            data: chartData.controlMeans,
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: i18nContent[currentLanguage].experimentalMean,
+                            data: chartData.experimentalMeans,
+                            backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
@@ -923,52 +844,100 @@
                         title: {
                             display: true,
                             text: i18nContent[currentLanguage].meanComparison
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false
                         }
                     },
                     scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Variables'
-                            }
-                        },
                         y: {
+                            beginAtZero: true,
                             title: {
                                 display: true,
                                 text: i18nContent[currentLanguage].meanComparison.split(" ")[0] + " Value"
-                            },
-                            beginAtZero: true
+                            }
                         }
                     }
                 }
             });
         }
 
-        // Export table data to an Excel file
+        // Export results to Excel
         function exportToExcel() {
-            // Determine which table is visible
-            let tableToExport;
             const testType = testTypeSelect.value;
+            let tableId = '';
+            let sheetName = '';
+            let fileName = '';
+
             if (testType === 'mann-whitney') {
-                tableToExport = document.getElementById('mannWhitneyTable');
-            } else if (testType === 'wilcoxon') {
-                tableToExport = document.getElementById('wilcoxonTable');
+                tableId = 'mannWhitneyTable';
+                sheetName = 'Mann-Whitney U Test Results';
+                fileName = 'Mann_Whitney_Results.xlsx';
+            } else {
+                tableId = 'wilcoxonTable';
+                sheetName = 'Wilcoxon Signed-Rank Test Results';
+                fileName = 'Wilcoxon_Results.xlsx';
             }
 
-            if (tableToExport) {
-                // Create a workbook from the HTML table element
-                const workbook = XLSX.utils.table_to_book(tableToExport, {sheet: "Analysis Results"});
+            // Truncate sheetName to a maximum of 31 characters
+            sheetName = sheetName.substring(0, 31);
 
-                // Write and download the file
-                const filename = `${testType}_results.xlsx`;
-                XLSX.writeFile(workbook, filename);
+            const table = document.getElementById(tableId);
+            const ws = XLSX.utils.table_to_sheet(table);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            XLSX.writeFile(wb, fileName);
+        }
+
+        // Copy displayed table to clipboard
+        function copyDisplayedTable() {
+            const testType = testTypeSelect.value;
+            let tableId = '';
+
+            if (testType === 'mann-whitney') {
+                tableId = 'mannWhitneyTable';
+            } else {
+                tableId = 'wilcoxonTable';
             }
+
+            const table = document.getElementById(tableId);
+            if (!table) {
+                console.error('Table not found for copying.');
+                return;
+            }
+
+            let tableText = '';
+            const rows = table.querySelectorAll('tr');
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('th, td');
+                const rowData = Array.from(cells).map(cell => cell.textContent.trim());
+                tableText += rowData.join('\t') + '\n'; // Use tab as delimiter and newline for rows
+            });
+
+            // Create a temporary textarea to copy the text
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = tableText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            // Provide visual feedback
+            const originalButtonText = copyTableBtn.textContent;
+            copyTableBtn.textContent = i18nContent[currentLanguage].tableCopied;
+            setTimeout(() => {
+                copyTableBtn.textContent = originalButtonText;
+            }, 2000);
+        }
+
+        // Download Excel template
+        function downloadTemplate() {
+            const ws_data = [
+                ["Variable 1", "Variable 2", "Variable 3"] // Example headers
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Data Template");
+            XLSX.writeFile(wb, "Data_Template.xlsx");
         }
     </script>
 </body>
 </html>
-
